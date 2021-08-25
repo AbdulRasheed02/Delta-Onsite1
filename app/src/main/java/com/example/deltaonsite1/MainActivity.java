@@ -272,15 +272,15 @@ public class MainActivity extends AppCompatActivity {
             countDownTimer.cancel();
             stopService(new Intent(MainActivity.this, myService.class));
             timerRunning = false;
-            btn_pause.setVisibility(View.INVISIBLE);
-            btn_start.setVisibility(View.VISIBLE);
-            START_TIME_IN_MILLIS=0;
-            TIME_LEFT_IN_MILLIS=0;
-            totalSeconds=0;
-            progressSeconds=0;
-            progressbar();
-            updateCountDownText(TIME_LEFT_IN_MILLIS);
         }
+        START_TIME_IN_MILLIS=0;
+        TIME_LEFT_IN_MILLIS=0;
+        totalSeconds=0;
+        progressSeconds=0;
+        progressbar();
+        updateCountDownText(TIME_LEFT_IN_MILLIS);
+        btn_pause.setVisibility(View.INVISIBLE);
+        btn_start.setVisibility(View.VISIBLE);
     }
 
     private void resetTimer() {
@@ -462,7 +462,6 @@ public class MainActivity extends AppCompatActivity {
             btn_pause.setVisibility(View.INVISIBLE);
             btn_start.setVisibility(View.VISIBLE);
         }
-        updateCountDownText(TIME_LEFT_IN_MILLIS);
     }
 
     @Override
