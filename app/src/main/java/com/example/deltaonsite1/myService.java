@@ -23,7 +23,6 @@ import java.util.TimerTask;
 public class myService extends Service {
     private static final String CHANNEL_ID = "NotificationChannelID";
     final Timer timer = new Timer();
-    Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
     @Nullable
     @Override

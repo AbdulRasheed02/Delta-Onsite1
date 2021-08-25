@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         btn_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(timerRunning){
+                if(countDownTimer != null){
                     stopTimer();
                 }
             }
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         btn_rewind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (timerRunning && TIME_LEFT_IN_MILLIS!=0) {
+                if (countDownTimer != null && TIME_LEFT_IN_MILLIS!=0) {
                     if (TIME_LEFT_IN_MILLIS - 10000 < 0) {
                         TIME_LEFT_IN_MILLIS = 0;
                         progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         btn_forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(timerRunning) {
+                if(countDownTimer != null) {
                     if (TIME_LEFT_IN_MILLIS + 10000 > START_TIME_IN_MILLIS) {
                         TIME_LEFT_IN_MILLIS = START_TIME_IN_MILLIS;
                         progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
@@ -247,9 +247,11 @@ public class MainActivity extends AppCompatActivity {
                         mp.stop();
                     }
                 }, 2000);
+                stopTimer();
             }
         }.start();
         timerRunning=true;
+
     }
 
     private void updateCountDownText(long TIME_LEFT_IN_MILLIS) {
@@ -262,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
     private void pauseTimer() {
         if(timerRunning){
             stopService(new Intent(MainActivity.this, myService.class));
+            timerRunning=false;
             countDownTimer.cancel();
         }
     }
@@ -284,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void resetTimer() {
-        if(timerRunning) {
+        if(countDownTimer != null) {
             stopService(new Intent(MainActivity.this, myService.class));
             progressSeconds=totalSeconds;
             progressbar.setProgress(progressSeconds);
@@ -442,15 +445,21 @@ public class MainActivity extends AppCompatActivity {
         START_TIME_IN_MILLIS= prefs.getLong("millisStart", START_TIME_IN_MILLIS);
         timerRunning = prefs.getBoolean("timerRunning", false);
         if (timerRunning) {
-            btn_pause.setVisibility(View.VISIBLE);
-            btn_start.setVisibility(View.INVISIBLE);
             endTime = prefs.getLong("endTime", 0);
             TIME_LEFT_IN_MILLIS = endTime - System.currentTimeMillis();
             if (TIME_LEFT_IN_MILLIS < 0) {
                 TIME_LEFT_IN_MILLIS = 0;
+                totalSeconds=(int)START_TIME_IN_MILLIS/1000;
+                progressbar.setMax(totalSeconds);
+                progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
+                progressbar.setProgress(progressSeconds);
                 timerRunning = false;
+                btn_pause.setVisibility(View.INVISIBLE);
+                btn_start.setVisibility(View.VISIBLE);
                 updateCountDownText(TIME_LEFT_IN_MILLIS);
             } else {
+                btn_pause.setVisibility(View.VISIBLE);
+                btn_start.setVisibility(View.INVISIBLE);
                 totalSeconds=(int)START_TIME_IN_MILLIS/1000;
                 progressbar.setMax(totalSeconds);
                 progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
