@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
     Context context;
 
     Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-    MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,54 +154,56 @@ public class MainActivity extends AppCompatActivity {
         btn_rewind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TIME_LEFT_IN_MILLIS-10000<0) {
-                    TIME_LEFT_IN_MILLIS=0;
-                    progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
+                if (timerRunning && TIME_LEFT_IN_MILLIS!=0) {
+                    if (TIME_LEFT_IN_MILLIS - 10000 < 0) {
+                        TIME_LEFT_IN_MILLIS = 0;
+                        progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                    } else {
+                        TIME_LEFT_IN_MILLIS = TIME_LEFT_IN_MILLIS - 10000;
+                        progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                    }
+                    if (timerRunning) {
+                        stopService(new Intent(MainActivity.this, myService.class));
+                        countDownTimer.cancel();
+                        startTimer();
+                        Intent intentService = new Intent(MainActivity.this, myService.class);
+                        progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                        Integer integerTimeSet = progressSeconds;
+                        intentService.putExtra("TimeValue", integerTimeSet);
+                        startService(intentService);
+                    }
+                    progressbar.setProgress(progressSeconds);
+                    updateCountDownText(TIME_LEFT_IN_MILLIS);
                 }
-                else{
-                    TIME_LEFT_IN_MILLIS = TIME_LEFT_IN_MILLIS - 10000;
-                    progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
-                }
-                if (timerRunning) {
-                    stopService(new Intent(MainActivity.this, myService.class));
-                    countDownTimer.cancel();
-                    startTimer();
-                    Intent intentService = new Intent(MainActivity.this, myService.class);
-                    progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
-                    Integer integerTimeSet = progressSeconds;
-                    intentService.putExtra("TimeValue", integerTimeSet);
-                    startService(intentService);
-                }
-                progressbar.setProgress(progressSeconds);
-                updateCountDownText(TIME_LEFT_IN_MILLIS);
             }
         });
 
         btn_forward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TIME_LEFT_IN_MILLIS+10000>START_TIME_IN_MILLIS) {
-                    TIME_LEFT_IN_MILLIS = START_TIME_IN_MILLIS;
-                    progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
-                }
-                else{
-                    TIME_LEFT_IN_MILLIS=TIME_LEFT_IN_MILLIS+10000;
-                    progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
-                }
-                if (timerRunning) {
-                    stopService(new Intent(MainActivity.this, myService.class));
-                    countDownTimer.cancel();
-                    startTimer();
-                    Intent intentService = new Intent(MainActivity.this, myService.class);
-                    progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
-                    Integer integerTimeSet = progressSeconds;
-                    intentService.putExtra("TimeValue", integerTimeSet);
-                    startService(intentService);
+                if(timerRunning) {
+                    if (TIME_LEFT_IN_MILLIS + 10000 > START_TIME_IN_MILLIS) {
+                        TIME_LEFT_IN_MILLIS = START_TIME_IN_MILLIS;
+                        progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                    } else {
+                        TIME_LEFT_IN_MILLIS = TIME_LEFT_IN_MILLIS + 10000;
+                        progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                    }
+                    if (timerRunning) {
+                        stopService(new Intent(MainActivity.this, myService.class));
+                        countDownTimer.cancel();
+                        startTimer();
+                        Intent intentService = new Intent(MainActivity.this, myService.class);
+                        progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                        Integer integerTimeSet = progressSeconds;
+                        intentService.putExtra("TimeValue", integerTimeSet);
+                        startService(intentService);
 
+                    }
+                    progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
+                    progressbar.setProgress(progressSeconds);
+                    updateCountDownText(TIME_LEFT_IN_MILLIS);
                 }
-                progressSeconds=(int)TIME_LEFT_IN_MILLIS/1000;
-                progressbar.setProgress(progressSeconds);
-                updateCountDownText(TIME_LEFT_IN_MILLIS);
             }
         });
 
@@ -246,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         mp.stop();
                     }
-                }, 6000);
+                }, 2000);
             }
         }.start();
         timerRunning=true;
@@ -440,8 +441,9 @@ public class MainActivity extends AppCompatActivity {
         TIME_LEFT_IN_MILLIS = prefs.getLong("millisLeft", START_TIME_IN_MILLIS);
         START_TIME_IN_MILLIS= prefs.getLong("millisStart", START_TIME_IN_MILLIS);
         timerRunning = prefs.getBoolean("timerRunning", false);
-        updateCountDownText(TIME_LEFT_IN_MILLIS);
         if (timerRunning) {
+            btn_pause.setVisibility(View.VISIBLE);
+            btn_start.setVisibility(View.INVISIBLE);
             endTime = prefs.getLong("endTime", 0);
             TIME_LEFT_IN_MILLIS = endTime - System.currentTimeMillis();
             if (TIME_LEFT_IN_MILLIS < 0) {
@@ -456,6 +458,11 @@ public class MainActivity extends AppCompatActivity {
                 startTimer();
             }
         }
+        else {
+            btn_pause.setVisibility(View.INVISIBLE);
+            btn_start.setVisibility(View.VISIBLE);
+        }
+        updateCountDownText(TIME_LEFT_IN_MILLIS);
     }
 
     @Override

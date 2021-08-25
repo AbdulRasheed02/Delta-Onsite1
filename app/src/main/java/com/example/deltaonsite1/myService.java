@@ -72,9 +72,11 @@ public class myService extends Service {
         catch (Exception e) {
             e.printStackTrace();
         }
+        stopForeground(true);
     }
     @Override
     public void onDestroy() {
+        stopForeground(true);
         timer.cancel();
     }
 }
