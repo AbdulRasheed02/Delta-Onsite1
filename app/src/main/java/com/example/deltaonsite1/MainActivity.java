@@ -200,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
                         startService(intentService);
 
                     }
-                    progressSeconds = (int) TIME_LEFT_IN_MILLIS / 1000;
                     progressbar.setProgress(progressSeconds);
                     updateCountDownText(TIME_LEFT_IN_MILLIS);
                 }
@@ -277,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
             btn_start.setVisibility(View.VISIBLE);
             START_TIME_IN_MILLIS=0;
             TIME_LEFT_IN_MILLIS=0;
+            totalSeconds=0;
             progressSeconds=0;
             progressbar();
             updateCountDownText(TIME_LEFT_IN_MILLIS);
